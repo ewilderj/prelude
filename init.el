@@ -7,6 +7,10 @@
 ;; Version: 1.1.0
 ;; Keywords: convenience
 
+(setenv "PATH" "/Users/edd/.cargo/bin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/openjdk/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin")
+(setq exec-path (split-string (getenv "PATH") path-separator))
+
+
 ;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
