@@ -11,9 +11,9 @@
   :init (doom-modeline-mode 1))
 
 (custom-set-faces
- '(mode-line ((t (:family "Zed Mono" :height 130))))
- '(mode-line-active ((t (:family "Zed Mono" :height 130)))) ; For 29+
- '(mode-line-inactive ((t (:family "Zed Mono" :height 130)))))
+ `(mode-line ((t (:family ,ewilderj-condense-font :height 130))))
+ `(mode-line-active ((t (:family ,ewilderj-condense-font :height 130)))) ; For 29+
+ `(mode-line-inactive ((t (:family ,ewilderj-condense-font :height 130)))))
 
 ;; this just takes up space
 (setq doom-modeline-lsp-icon nil)

@@ -17,3 +17,8 @@
 
   ;; you may want to add different for other charset in this way.
   )
+
+(if (string= system-name "Edds-MacBook-Air.local")
+    (setq ewilderj-condense-font "ZedMono Nerd Font Mono")
+    (setq ewilderj-condense-font "Zed Mono")
+  )
