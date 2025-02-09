@@ -8,4 +8,4 @@
 
 ;; and for echo area, which shares space with the minibuf
 (with-current-buffer (get-buffer " *Echo Area 0*")
-  (setq-local face-remapping-alist '((default :family ewilderj-condense-font :height 130))))
+  (setq-local face-remapping-alist `((default :family ,ewilderj-condense-font :height 130))))

@@ -32,3 +32,7 @@ var/
 .lsp-session*
 gotools/
 eln-cache/
+straight/
+anaconda-mode/
+org-persist/
+projects
