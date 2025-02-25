@@ -14,3 +14,5 @@
           compilation-mode))
   (popper-mode +1)
   (popper-echo-mode +1))                ; For echo area hints
+
+(setq popper-display-control t)
