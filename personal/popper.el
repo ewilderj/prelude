@@ -10,6 +10,7 @@
           ("Output\\*$" . hide)
           ("Warnings" . hide)
           "\\*Async Shell Command\\*"
+          "vc\-"
           help-mode
           compilation-mode))
   (popper-mode +1)
