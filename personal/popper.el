@@ -17,3 +17,6 @@
   (popper-echo-mode +1))                ; For echo area hints
 
 (setq popper-display-control t)
+
+(custom-set-variables
+ '(popper-mode-line '(:eval (propertize "🌶️ " 'face 'mode-line-emphasis))))
