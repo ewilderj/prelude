@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (use-package popper
   :ensure t ; or :straight t
   :bind (("C-`"   . popper-toggle)
@@ -5,9 +6,9 @@
          ("C-M-`" . popper-toggle-type))
   :init
   (setq popper-reference-buffers
-        '("\\*Messages\\*"
-          "Output\\*$"
-          "\\*Warnings\\*"
+        '(("\\*Messages\\*" . hide)
+          ("Output\\*$" . hide)
+          ("Warnings" . hide)
           "\\*Async Shell Command\\*"
           help-mode
           compilation-mode))
