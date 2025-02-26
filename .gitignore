@@ -36,3 +36,4 @@ straight/
 anaconda-mode/
 org-persist/
 projects
+forge-database.sqlite
