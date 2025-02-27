@@ -17,3 +17,4 @@
 
 ;; I think popper makes this bothersome, so turn it off
 (setq copilot-indent-offset-warning-disable t)
+(setq copilot-max-char-warning-disable t)
