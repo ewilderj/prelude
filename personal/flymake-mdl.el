@@ -13,6 +13,7 @@
 ;; $ npm install -D @github/markdownlint-github
 
 (setq markdown-command '("/Users/ewilderj/bin/gh-markdown.sh"))
+(add-hook 'markdown-mode-hook 'visual-line-mode)
 
 ;; gh-markdown.sh wraps cmark_gfm:
 
