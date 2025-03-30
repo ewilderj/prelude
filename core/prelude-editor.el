@@ -59,16 +59,17 @@
 (global-auto-revert-mode t)
 
 ;; hippie expand is dabbrev expand on steroids
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-expand-all-abbrevs
-                                         try-expand-list
-                                         try-expand-line
-                                         try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol))
+(when prelude-hippie-expand
+  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                           try-expand-dabbrev-all-buffers
+                                           try-expand-dabbrev-from-kill
+                                           try-complete-file-name-partially
+                                           try-complete-file-name
+                                           try-expand-all-abbrevs
+                                           try-expand-list
+                                           try-expand-line
+                                           try-complete-lisp-symbol-partially
+                                           try-complete-lisp-symbol)))
 
 ;; smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
@@ -221,9 +222,10 @@
       bookmark-save-flag 1)
 
 ;; projectile is a project management mode
-(require 'projectile)
-(setq projectile-cache-file (expand-file-name  "projectile.cache" prelude-savefile-dir))
-(projectile-mode t)
+(when prelude-projectile
+  (require 'projectile)
+  (setq projectile-cache-file (expand-file-name  "projectile.cache" prelude-savefile-dir))
+  (projectile-mode t))
 
 ;; avy allows us to effectively navigate to visible things
 (require 'avy)
