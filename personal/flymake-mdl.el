@@ -6,14 +6,16 @@
   :config
   (add-hook 'markdown-mode-hook 'flymake-mode)
   (add-hook 'markdown-mode-hook 'flymake-markdownlint-cli2-setup)
-  (setq flymake-markdownlint-cli2-config "/Users/ewilderj/etc/github.markdownlint-cli2.mjs"))
+  (add-hook 'markdown-mode-hook 'visual-line-mode)
+  (let ((home-dir (expand-file-name "~")))
+    (setq flymake-markdownlint-cli2-config
+          (concat home-dir "/etc/github.markdownlint-cli2.mjs"))
+    (setq markdown-command
+          (concat home-dir "/bin/gh-markdown.sh"))))
 
 ;; sets personal config, which takes advantage of the fact that extensions
 ;; are installed for formatting GitHub markdown...
 ;; $ npm install -D @github/markdownlint-github
-
-(setq markdown-command '("/Users/ewilderj/bin/gh-markdown.sh"))
-(add-hook 'markdown-mode-hook 'visual-line-mode)
 
 ;; gh-markdown.sh wraps cmark_gfm:
 
