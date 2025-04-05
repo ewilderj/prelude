@@ -14,3 +14,7 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
+;; quickly jump on org
+
+(straight-use-package 'org)
