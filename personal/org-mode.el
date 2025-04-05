@@ -1,2 +1,3 @@
 ;; -*- lexical-binding: t; -*-
-(use-package ox-pandoc)
+(use-package ox-pandoc
+  :after org)
