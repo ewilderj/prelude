@@ -1,28 +1,29 @@
+;; Copilot configuration		 -*- lexical-binding: t; -*-
+(defun my-check-copilot-server-installed ()
+  (condition-case err
+      (progn
+        (if (file-exists-p (copilot-server-executable)) t
+          nil))
+      (error
+       (message "Error enabling copilot mode '%s'" err)
+       nil)))
+
 (use-package copilot
   :ensure t
   :demand t
   :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+  :after (popper)
   :config
-  (condition-case err
+  (if (not (my-check-copilot-server-installed))
       (progn
-        (message "Attempting to enable copilot-mode")
-        (copilot-mode 1)
-        (add-hook 'prog-mode-hook 'copilot-mode)
-        )
-    (error
-     (message "Error enabling copilot mode '%s', trying to install server" err)
-     (progn
-       (interactive)
-       (copilot-install-server)
-       )
-     )
-    )
-)
-
-(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
-
-(add-to-list 'copilot-major-mode-alist '("enh-ruby" . "ruby"))
+        (copilot-install-server)
+        (sleep-for 4)))
+  (add-hook 'prog-mode-hook 'copilot-mode)
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+  (add-to-list 'copilot-major-mode-alist '("enh-ruby" . "ruby"))
+  (setq copilot-indent-offset-warning-disable t)
+  (setq copilot-max-char-warning-disable t))
 
 (use-package copilot-chat
     :ensure t
@@ -31,5 +32,15 @@
 )
 
 ;; I think popper makes this bothersome, so turn it off
-(setq copilot-indent-offset-warning-disable t)
-(setq copilot-max-char-warning-disable t)
+
+
+
+;; (condition-case err
+;;     (progn
+;;       (message "Attempting to enable copilot-mode")
+;;       (copilot-mode 1)
+;;       )
+;;   (error
+;;    (message "Error enabling copilot mode '%s', trying to install server" err)
+;;    (progn
+;;      (copilot-install-server))))

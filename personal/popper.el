@@ -10,6 +10,7 @@
           ("Output\\*$" . hide)
           ("Warnings" . hide)
           "\\*Async Shell Command\\*"
+          ("\\*copilot-install-server\\*" . hide)
           "vc\-"
           help-mode
           compilation-mode))
