@@ -1,5 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 (use-package flymake-markdownlint-cli2
+  :ensure t 
   :vc (:url "https://github.com/ewilderj/flymake-markdownlint-cli2"
             :rev :newest
             :branch "main")

@@ -1,2 +1,3 @@
 (use-package forge
-  :after magit)
+  :after magit 
+  :ensure t)

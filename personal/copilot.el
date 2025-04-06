@@ -1,4 +1,5 @@
 (use-package copilot
+  :ensure t
   :vc (:url "https://github.com/copilot-emacs/copilot.el"
             :rev :newest
             :branch "main"))
@@ -12,6 +13,7 @@
 (add-to-list 'copilot-major-mode-alist '("enh-ruby" . "ruby"))
 
 (use-package copilot-chat
+    :ensure t
     :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
     :after (request org markdown-mode shell-maker))
 
