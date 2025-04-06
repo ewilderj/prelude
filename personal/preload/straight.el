@@ -15,6 +15,6 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; quickly jump on org
 
-(straight-use-package 'org)
+;; 
+(use-package org :straight (:type built-in))

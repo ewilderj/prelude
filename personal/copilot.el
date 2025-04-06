@@ -28,7 +28,7 @@
 (use-package copilot-chat
     :ensure t
     :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-    :after (copilot request org markdown-mode shell-maker)
+    :after (request markdown-mode shell-maker)
 )
 
 ;; I think popper makes this bothersome, so turn it off
