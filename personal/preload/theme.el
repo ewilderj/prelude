@@ -1,12 +1,19 @@
-;; (setq prelude-theme 'sanityinc-tomorrow-eighties)
-;; (setq prelude-theme 'solarized-dark)
+;; theme configuration -*- lexical-binding: t; -*-
 
-(use-package dracula-theme
+(use-package solarized-theme
   :ensure t
-  :demand t
-  :straight (:host github :repo "dracula/emacs" :files ("*.el"))
-  :config
-  (setq prelude-theme 'dracula))
+  :custom
+  (prelude-theme 'solarized-dark)
+  (solarized-use-variable-pitch nil))
+
+;; (use-package dracula-theme
+;;   :ensure t
+;;   :demand t
+;;   :straight (:host github :repo "dracula/emacs" :files ("*.el"))
+;;   :custom
+;;   (prelude-theme 'dracula))
+
+
 
 ;; (use-package autothemer
 ;;   :ensure t)
