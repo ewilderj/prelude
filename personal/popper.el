@@ -9,6 +9,7 @@
         '(("\\*Messages\\*" . hide)
           ("Output\\*$" . hide)
           ("Warnings" . hide)
+          ("\\*Warnings\\*" . hide)
           "\\*Async Shell Command\\*"
           ("\\*copilot-install-server\\*" . hide)
           "vc\-"
@@ -18,6 +19,7 @@
   (popper-echo-mode +1))                ; For echo area hints
 
 (setq popper-display-control t)
+(setq warning-minimum-level :error)
 
 (custom-set-variables
  '(popper-mode-line '(:eval (propertize "🌶️ " 'face 'mode-line-emphasis))))
