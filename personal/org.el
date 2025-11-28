@@ -13,6 +13,7 @@
 (setq org-agenda-files '("~/gtd/inbox.org"
                          "~/gtd/projects.org"
                          "~/gtd/tickler.org"
+                         "~/gtd/todoist.org"
                          ))
 
 ;; save org buffers when we idle
@@ -33,7 +34,7 @@
 
 (setq org-todo-keywords
       (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-              (sequence "WAITING(w)" "HOLD(h)" "|" "CANCELLED(c)" "PHONE" "MEETING"))))
+              (sequence "WAITING(w)" "HOLD(h)" "|" "CANCELED(c)" "PHONE" "MEETING"))))
 
 (add-hook 'org-capture-mode-hook #'auto-fill-mode)
 (setq org-ellipsis " ⤵")
@@ -102,3 +103,17 @@
            ))
         ) ; end org-agenda-custom-commands
   )
+
+(use-package org-tidy
+  :after org
+  :ensure t
+  :hook
+  (org-mode . org-tidy-mode))
+
+(use-package adaptive-wrap
+  :straight t
+  :after org
+  :ensure t
+  :hook ((visual-line-mode . adaptive-wrap-prefix-mode)
+         (org-mode . visual-line-mode)
+         (org-mode . org-indent-mode)))
