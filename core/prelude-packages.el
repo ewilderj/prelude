@@ -50,7 +50,8 @@
       (load prelude-pinned-packages-file)))
 
 ;; set package-user-dir to be relative to Prelude install path
-(setq package-user-dir (expand-file-name "elpa" prelude-dir))
+(when prelude-override-package-user-dir
+  (setq package-user-dir (expand-file-name "elpa" prelude-dir)))
 
 (unless package--initialized
     (package-initialize))
@@ -203,12 +204,6 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
     ("\\.yml\\'" yaml-mode yaml-mode)
     ("\\.yaml\\'" yaml-mode yaml-mode)
     ("Dockerfile\\'" dockerfile-mode dockerfile-mode)))
-
-;; markdown-mode doesn't have autoloads for the auto-mode-alist
-;; so we add them manually if it's already installed
-(when (package-installed-p 'markdown-mode)
-  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . gfm-mode))
-  (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode)))
 
 ;; same with adoc-mode
 (when (package-installed-p 'adoc-mode)
