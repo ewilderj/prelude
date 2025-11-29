@@ -16,6 +16,21 @@
                          "~/gtd/todoist.org"
                          ))
 
+;; aesthetics, from https://github.com/minad/org-modern
+(setq
+ ;; Edit settings
+ org-auto-align-tags nil
+ org-tags-column 0
+ org-catch-invisible-edits 'show-and-error
+ org-special-ctrl-a/e t
+ org-insert-heading-respect-content t
+
+ ;; Org styling, hide markup etc.
+ org-hide-emphasis-markers t
+ org-pretty-entities t
+ org-agenda-tags-column 0
+ org-ellipsis "…")
+
 ;; save org buffers when we idle
 (setq ewj/org-timer (run-with-idle-timer 300 t 'org-save-all-org-buffers))
 
@@ -37,7 +52,7 @@
               (sequence "WAITING(w)" "HOLD(h)" "|" "CANCELED(c)" "PHONE" "MEETING"))))
 
 (add-hook 'org-capture-mode-hook #'auto-fill-mode)
-(setq org-ellipsis " ⤵")
+
 (setq org-refile-targets '(("~/gtd/projects.org" :maxlevel . 3)
                            ("~/gtd/someday.org" :level . 1)
                            ("~/gtd/notes.org" :level . 1)
@@ -59,11 +74,11 @@
   :after org
   :ensure t)
 
-(use-package org-bullets
-  :after org
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+;; (use-package org-bullets
+;;   :after org
+;;   :ensure t
+;;   :config
+;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (use-package org-projectile
   :after org
@@ -104,12 +119,6 @@
         ) ; end org-agenda-custom-commands
   )
 
-(use-package org-tidy
-  :after org
-  :ensure t
-  :hook
-  (org-mode . org-tidy-mode))
-
 (use-package adaptive-wrap
   :straight t
   :after org
@@ -117,3 +126,9 @@
   :hook ((visual-line-mode . adaptive-wrap-prefix-mode)
          (org-mode . visual-line-mode)
          (org-mode . org-indent-mode)))
+
+(use-package org-modern
+  :after org
+  :ensure t
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda)))

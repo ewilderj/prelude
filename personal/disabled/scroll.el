@@ -21,6 +21,3 @@
 ;; and text scaling (bound to ctrl + mouse wheel by default).
 (advice-add 'mwheel-scroll          :around #'filter-mwheel-always-coalesce)
 (advice-add 'mouse-wheel-text-scale :around #'filter-mwheel-always-coalesce)
-
-
-(pixel-scroll-mode 1)

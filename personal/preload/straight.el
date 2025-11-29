@@ -15,12 +15,15 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(use-package org :straight (:type built-in)
+(use-package org
+  :straight (:type built-in)
   :custom
   (org-hide-emphasis-markers t)
-  :config
+  :hook
+  (org-mode . (lambda () (display-line-numbers-mode 0)))
+;;  :config
   ;; substitute hyphen with bullet
-  (font-lock-add-keywords 'org-mode
-                            '(("^ *\\([-]\\) "
-                               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+;;  (font-lock-add-keywords 'org-mode
+;;                          '(("^ *\\([-]\\) "
+;;                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
   )
