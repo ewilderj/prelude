@@ -2,3 +2,4 @@
 
 (setq whitespace-style '(face tabs spaces trailing space-before-tab
                               newline empty space-after-tab))
+(menu-bar-mode -1)

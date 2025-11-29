@@ -18,6 +18,12 @@
   ;; you may want to add different for other charset in this way.
   )
 
+(when (eq system-type 'gnu/linux)
+  ;; default Latin font (e.g. Consolas)
+  (set-face-attribute 'default nil :family "FiraCode Nerd Font")
+  ;; default font size (point * 10)
+  (set-face-attribute 'default nil :height 120))
+
 (if (string= system-name "PHG1FDQ07G")
     (setq ewilderj-condense-font "ZedMono Nerd Font Mono")
     (setq ewilderj-condense-font "Zed Mono")
