@@ -74,12 +74,6 @@
   :after org
   :ensure t)
 
-;; (use-package org-bullets
-;;   :after org
-;;   :ensure t
-;;   :config
-;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
 (use-package org-projectile
   :after org
   :ensure t
@@ -132,3 +126,8 @@
   :ensure t
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)))
+
+(use-package org-tidy
+  :ensure t
+  :hook
+  (org-mode . org-tidy-mode))

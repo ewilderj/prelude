@@ -11,7 +11,9 @@
   :config
   (if (eq system-type 'darwin)
       (advice-add 'browse-url-xdg-open :override #'browse-url-default-macosx-browser))
-  (setopt org-todoist-api-token (getenv "TODOIST_TOKEN"))
+  (setopt org-todoist-api-token
+          (or (getenv "TODOIST_TOKEN")
+              (my/get-1pass-secret "op://Private/Todoist API Key/credential")))
   (setopt org-todoist-delete-remote-items t)
   (org-todoist-background-sync)
   (nconc org-capture-templates
