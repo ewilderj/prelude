@@ -54,6 +54,7 @@
 (add-hook 'org-capture-mode-hook #'auto-fill-mode)
 
 (setq org-refile-targets '(("~/gtd/projects.org" :maxlevel . 3)
+                           ("~/gtd/todoist.org" :maxlevel . 4)
                            ("~/gtd/someday.org" :level . 1)
                            ("~/gtd/notes.org" :level . 1)
                            ("~/gtd/tickler.org" :maxlevel . 2)))
