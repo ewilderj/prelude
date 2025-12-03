@@ -14,6 +14,7 @@
                          "~/gtd/projects.org"
                          "~/gtd/tickler.org"
                          "~/gtd/todoist.org"
+                         "~/gtd/outlook.org"
                          ))
 
 ;; aesthetics, from https://github.com/minad/org-modern

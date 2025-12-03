@@ -15,7 +15,7 @@
           (or (getenv "TODOIST_TOKEN")
               (my/get-1pass-secret "op://Private/Todoist API Key/credential")))
   (setopt org-todoist-delete-remote-items t)
-  (org-todoist-background-sync)
+;;  (org-todoist-background-sync)
   (nconc org-capture-templates
        `(("s" "Todoist")
          ;; Capture a TODO directly to the inbox

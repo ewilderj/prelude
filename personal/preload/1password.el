@@ -10,5 +10,5 @@
   (let ((op-path (executable-find "op")))
     (if op-path
         ;; The --no-newline flag prevents trailing whitespace issues
-        (string-trim (shell-command-to-string (format "%s read \"%s\" --no-newline" op-path reference)))
+        (string-trim (shell-command-to-string (format "%s --account RDGZPPL5VJGIRKKKZXHRNQ2ULU read \"%s\" --no-newline" op-path reference)))
       (warn "1Password CLI (op) not found in exec-path"))))
