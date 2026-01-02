@@ -133,3 +133,35 @@
   :ensure t
   :hook
   (org-mode . org-tidy-mode))
+
+;; personal strategy capture stuff
+(setq org-capture-templates
+      (append org-capture-templates
+              '(("s" "Daily Strategy Card" entry
+                 (file+olp+datetree "~/gtd/journal.org")
+                 "* Daily Strategic Review: The Vital Three :strategy:
+%U
+** The Strategic Grip
+\"Review these pillars before opening Slack or Email.\"
+
+*** Pillar 1: Technical Sovereignty
+- Focus: AI-integrated TPM workflows + Personal Projects
+- [ ] Next Stop Sign: %^{Next Step (Tech)}
+
+*** Pillar 2: Financial Resilience
+- Focus: Coaching & Side Hustle Ideation
+- [ ] Next Stop Sign: %^{Next Step (Finance)}
+
+*** Pillar 3: Institutional Advancement
+- Focus: Exec Connections & Amador Salons
+- [ ] Next Stop Sign: %^{Next Step (Inst)}
+
+** Easy Mode Checklist
+- [ ] Movement: Is the transition walk scheduled?
+- [ ] Gap Check: Am I avoiding a \"Mountain\"? Break it into \"Paragraphs.\"
+- [ ] Isolation Veto: Have I signaled a +1 friend (Julie, Scott, Dave, John, Gavin)?
+
+** Evening Shutdown
+- [ ] Shutdown Boundary: Laptop closed after transition walk.
+- [ ] Sleep Anchor: Target 10:30 PM (No negotiations)."
+                 :immediate-finish nil :jump-to-captured t))))
