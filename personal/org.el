@@ -127,8 +127,6 @@
   :after org
   :ensure t
   :config
-  (setq org-modern-table nil) ;; Keep badges/stars, but use standard
-                              ;; ASCII tables
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)))
 
