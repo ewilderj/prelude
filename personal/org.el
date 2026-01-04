@@ -11,6 +11,7 @@
 (setq org-confirm-elisp-link-function nil)
 
 (setq org-agenda-files '("~/gtd/inbox.org"
+                         "~/gtd/work.org"
                          "~/gtd/projects.org"
                          "~/gtd/tickler.org"
                          "~/gtd/todoist.org"
@@ -56,6 +57,7 @@
 
 (setq org-refile-targets '(("~/gtd/projects.org" :maxlevel . 3)
                            ("~/gtd/todoist.org" :maxlevel . 4)
+                           ("~/gtd/work.org" :maxlevel . 3)
                            ("~/gtd/someday.org" :level . 1)
                            ("~/gtd/notes.org" :level . 1)
                            ("~/gtd/tickler.org" :maxlevel . 2)))
