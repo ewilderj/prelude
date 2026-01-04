@@ -13,7 +13,7 @@
   ;;    This is what we will force Tables and Code Blocks to use.
   (set-face-attribute 'fixed-pitch nil :family "FiraCode Nerd Font" :height 130)
   ;; 3. Set the Variable Pitch face (for reading text)
-  (set-face-attribute 'variable-pitch nil :family "Avenir Next" :height 140
+  (set-face-attribute 'variable-pitch nil :family "Fira Sans" :height 140
                       :weight 'regular))
 
 (when (eq system-type 'gnu/linux)
@@ -22,9 +22,10 @@
   ;; default font size (point * 10)
   (set-face-attribute 'default nil :height 120)
   (set-face-attribute 'fixed-pitch nil :family "FiraCode Nerd Font" :height 120)
-  (set-face-attribute 'variable-pitch nil :family "Ubuntu" :height 130
+  (set-face-attribute 'variable-pitch nil :family "Fira Sans" :height 140
                       :weight 'regular))
 
+;; github laptop
 (if (string= system-name "PHG1FDQ07G")
     (setq ewilderj-condense-font "ZedMono Nerd Font Mono")
     (setq ewilderj-condense-font "Zed Mono")

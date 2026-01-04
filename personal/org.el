@@ -130,10 +130,10 @@
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)))
 
-(use-package org-tidy
-  :ensure t
-  :hook
-  (org-mode . org-tidy-mode))
+;;(use-package org-tidy
+;;  :ensure t
+;;  :hook
+;;  (org-mode . org-tidy-mode))
 
 (use-package mixed-pitch
   :ensure t
@@ -178,6 +178,8 @@
    'append))
 
 (add-hook 'org-mode-hook #'ewj/org-fixed-pitch-tables)
+
+
 
 
 ;; personal strategy capture stuff
