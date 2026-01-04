@@ -145,32 +145,23 @@
   :config
   (setq mixed-pitch-fixed-pitch-faces
         (append mixed-pitch-fixed-pitch-faces
-                '(org-table
-                  org-code
-                  org-block
-                  org-block-begin-line
-                  org-block-end-line
-                  org-meta-line             ; For #+TBLFM lines
-                  org-document-info-keyword ; For #+TITLE, #+AUTHOR
-                  org-special-keyword       ; For TODO, DONE etc
+                '(org-special-keyword       ; For TODO, DONE etc
                   org-modern-symbol         ; Vital for org-modern table borders
                   org-modern-tag)))
-  ;; Force ALL characters in org tables to use fixed-pitch via font-lock
-  (setq mixed-pitch-set-height t))
+  )
 
 ;; -----------------------------------------------------------------------------
 ;; FIX: TABLE ALIGNMENT IN MIXED-PITCH MODE
 ;; -----------------------------------------------------------------------------
-;; Problem: mixed-pitch-mode defaults spaces to the variable-pitch font (Avenir).
+;; Problem: mixed-pitch-mode defaults spaces to the variable-pitch font.
 ;; Even if 'org-table' is whitelisted, spaces *between* pipes often fail to
 ;; inherit the fixed-pitch face, causing columns to collapse and drift.
-;;
-;; Failed Attempt: Simply appending 'org-table to mixed-pitch-fixed-pitch-faces.
 ;;
 ;; Solution: Use font-lock keywords to brute-force the 'fixed-pitch' face onto
 ;; the ENTIRE line if it looks like a table row (starts/ends with pipes).
 ;; This forces spaces, borders, and text to all use the same monospaced font.
 ;; -----------------------------------------------------------------------------
+
 ;; This function applies fixed-pitch to entire table regions including spaces
 (defun ewj/org-fixed-pitch-tables ()
   "Apply fixed-pitch face to entire org tables, including spaces."
