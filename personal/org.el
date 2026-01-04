@@ -133,7 +133,10 @@
 (use-package org-tidy
  :ensure t
  :hook
- (org-mode . org-tidy-mode))
+ (org-mode . org-tidy-mode)
+ :config
+ (define-key org-mode-map (kbd "C-c C-x t") #'org-tidy-toggle)
+ )
 
 (use-package mixed-pitch
   :ensure t
