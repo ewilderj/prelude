@@ -130,10 +130,10 @@
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)))
 
-;;(use-package org-tidy
-;;  :ensure t
-;;  :hook
-;;  (org-mode . org-tidy-mode))
+(use-package org-tidy
+ :ensure t
+ :hook
+ (org-mode . org-tidy-mode))
 
 (use-package mixed-pitch
   :ensure t
