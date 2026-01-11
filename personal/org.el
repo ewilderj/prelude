@@ -128,11 +128,13 @@
 (use-package org-modern
   :after org
   :ensure t
-  :config
+;;  :custom
+;;  (org-modern-table nil)  ; Disable table prettification - incompatible with mixed-pitch
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)))
 
 (use-package org-tidy
+  :after org
  :ensure t
  :hook
  (org-mode . org-tidy-mode)
@@ -141,30 +143,26 @@
  )
 
 (use-package mixed-pitch
+  :after org
   :ensure t
   :hook
   (text-mode . mixed-pitch-mode)
+  ;; :custom
+  ;; (mixed-pitch-face 'ewj/reading-face)
+  ;; (mixed-pitch-set-height t)
   :config
   (setq mixed-pitch-fixed-pitch-faces
         (append mixed-pitch-fixed-pitch-faces
-                '(org-special-keyword       ; For TODO, DONE etc
+                '(org-table
+                  org-modern-label
+                  org-modern-date
+                  org-modern-time
+                  org-special-keyword       ; For TODO, DONE etc
                   org-modern-symbol         ; Vital for org-modern table borders
                   org-modern-tag)))
   )
 
-;; -----------------------------------------------------------------------------
-;; FIX: TABLE ALIGNMENT IN MIXED-PITCH MODE
-;; -----------------------------------------------------------------------------
-;; Problem: mixed-pitch-mode defaults spaces to the variable-pitch font.
-;; Even if 'org-table' is whitelisted, spaces *between* pipes often fail to
-;; inherit the fixed-pitch face, causing columns to collapse and drift.
-;;
-;; Solution: Use font-lock keywords to brute-force the 'fixed-pitch' face onto
-;; the ENTIRE line if it looks like a table row (starts/ends with pipes).
-;; This forces spaces, borders, and text to all use the same monospaced font.
-;; -----------------------------------------------------------------------------
 
-;; This function applies fixed-pitch to entire table regions including spaces
 (defun ewj/org-fixed-pitch-tables ()
   "Apply fixed-pitch face to entire org tables, including spaces."
   (font-lock-add-keywords
@@ -175,6 +173,12 @@
 
 (add-hook 'org-mode-hook #'ewj/org-fixed-pitch-tables)
 
+;; ;; ;; bump up in the scale in org-mode bc mixed-pitch-mode makes it small
+;; (defun ewj/org-mode-scale-text ()
+;;   "Apply a relative text scale increase for org-mode buffers."
+;;   (text-scale-increase 1))
+
+;; (add-hook 'org-mode-hook #'ewj/org-mode-scale-text)
 
 
 
