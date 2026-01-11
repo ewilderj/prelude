@@ -25,8 +25,4 @@
   (set-face-attribute 'variable-pitch nil :family "Fira Sans" :height 140
                       :weight 'regular))
 
-;; github laptop
-(if (string= system-name "PHG1FDQ07G")
-    (setq ewilderj-condense-font "ZedMono Nerd Font Mono")
-    (setq ewilderj-condense-font "Zed Mono")
-  )
+(setq ewilderj-condense-font "Zed Mono")
