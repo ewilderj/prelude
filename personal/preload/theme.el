@@ -16,14 +16,22 @@
 ;;   :custom
 ;;   (prelude-theme 'monokai))
 
-(use-package dracula-theme
-  :ensure t
-  :demand t
-  :straight (:host github :repo "dracula/emacs" :files ("*.el"))
-  :custom
-  (prelude-theme 'dracula))
+;; (use-package dracula-theme
+;;   :ensure t
+;;   :demand t
+;;   :straight (:host github :repo "dracula/emacs" :files ("*.el"))
+;;   :custom
+;;   (prelude-theme 'dracula))
+
+(add-to-list 'custom-theme-load-path prelude-personal-dir)
+(setq prelude-theme 'dracula-light)
 
 
+;; (use-package dracula-light-theme
+;;  :load-path "personal"
+;;  :ensure nil
+;;  :custom
+;;  (prelude-theme 'dracula-light))
 
 ;; (use-package autothemer
 ;;   :ensure t)
