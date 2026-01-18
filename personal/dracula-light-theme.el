@@ -59,26 +59,26 @@ The theme has to be reloaded after changing anything in this group."
 
 ;; Assigment form: VARIABLE COLOR [256-COLOR [TTY-COLOR]]
 (let ((colors '(;; Upstream theme color
-                (dracula-bg      "#ffffff" "white" "white")         ; official background (inverted)
-                (dracula-fg      "#282a36" "black" "black")         ; official foreground (inverted)
-                (dracula-current "#f0f0f0" "#e0e0e0" "white")       ; official current-line/selection (inverted)
-                (dracula-comment "#6272a4" "#5f5faf" "blue")        ; official comment
-                (dracula-cyan    "#006F9F" "#0087ff" "blue")        ; official cyan (darkened)
-                (dracula-green   "#288C28" "#00af00" "green")       ; official green (darkened)
-                (dracula-orange  "#C76B00" "#ffaf5f" "red")         ; official orange (darkened)
-                (dracula-pink    "#B83896" "#ff87d7" "magenta")     ; official pink (darkened)
-                (dracula-purple  "#8040BF" "#af87ff" "magenta")     ; official purple (darkened)
-                (dracula-red     "#C91B1B" "#ff8787" "red")         ; official red (darkened)
-                (dracula-yellow  "#9E8000" "#ffff87" "yellow")      ; official yellow (darkened)
+                (dracula-bg      "#FFFBEB" "white" "white")         ; official background
+                (dracula-fg      "#1F1F1F" "black" "black")         ; official foreground
+                (dracula-current "#CFCFDE" "#e0e0e0" "white")       ; official selection
+                (dracula-comment "#6C664B" "#5f5faf" "blue")        ; official comment
+                (dracula-cyan    "#036A96" "#0087ff" "blue")        ; official cyan
+                (dracula-green   "#14710A" "#00af00" "green")       ; official green
+                (dracula-orange  "#A34D14" "#ffaf5f" "red")         ; official orange
+                (dracula-pink    "#A3144D" "#ff87d7" "magenta")     ; official pink
+                (dracula-purple  "#644AC9" "#af87ff" "magenta")     ; official purple
+                (dracula-red     "#CB3A2A" "#ff8787" "red")         ; official red
+                (dracula-yellow  "#846E15" "#ffff87" "yellow")      ; official yellow
                 ;; Other colors
-                (bg2             "#e0e0e0" "#e4e4e4" "white")
-                (bg3             "#d0d0d0" "#cccccc" "white")
-                (fg2             "#383a46" "#444444" "black")
-                (fg3             "#505050" "#555555" "black")
-                (fg4             "#606060" "#666666" "black")
-                (dark-red        "#ffcccc" "#ffafaf" "red")         ; lighter for background use? (inverted logic)
-                (dark-green      "#ccffcc" "#afffaf" "green")       ; lighter for background use?
-                (dark-blue       "#ccccff" "#afafff" "blue")))
+                (bg2             "#F0ECD6" "#e4e4e4" "white")       ; slightly darker than bg
+                (bg3             "#E0DCC6" "#cccccc" "white")       ; even darker
+                (fg2             "#2F2F2F" "#444444" "black")       ; lighter fg
+                (fg3             "#4F4F4F" "#555555" "black")       ; even lighter fg
+                (fg4             "#6F6F6F" "#666666" "black")       ; lightest fg
+                (dark-red        "#FADAD7" "#ffafaf" "red")         ; pale red for diffs
+                (dark-green      "#D6F5D3" "#afffaf" "green")       ; pale green for diffs
+                (dark-blue       "#D6DEFA" "#afafff" "blue")))
       (faces '(;; default / basic faces
                (cursor :background ,fg3)
                (default :background ,dracula-bg :foreground ,dracula-fg)
