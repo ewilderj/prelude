@@ -50,6 +50,16 @@ The theme has to be reloaded after changing anything in this group."
   :type 'number
   :group 'dracula-light)
 
+(defcustom dracula-light-bg "#FFFBEB"
+  "Background color for the Dracula Light theme."
+  :type 'string
+  :group 'dracula-light)
+
+(defcustom dracula-light-comment "#6C664B"
+  "Comment color for the Dracula Light theme."
+  :type 'string
+  :group 'dracula-light)
+
 (defcustom dracula-light-alternate-mode-line-and-minibuffer nil
   "Use less bold and pink in the minibuffer."
   :type 'boolean
@@ -58,11 +68,11 @@ The theme has to be reloaded after changing anything in this group."
 ;;;; Theme definition:
 
 ;; Assigment form: VARIABLE COLOR [256-COLOR [TTY-COLOR]]
-(let ((colors '(;; Upstream theme color
-                (dracula-bg      "#FFFBEB" "white" "white")         ; official background
+(let ((colors `(;; Upstream theme color
+                (dracula-bg      ,dracula-light-bg "white" "white") ; official background
                 (dracula-fg      "#1F1F1F" "black" "black")         ; official foreground
                 (dracula-current "#CFCFDE" "#e0e0e0" "white")       ; official selection
-                (dracula-comment "#6C664B" "#5f5faf" "blue")        ; official comment
+                (dracula-comment ,dracula-light-comment "#5f5faf" "blue") ; official comment
                 (dracula-cyan    "#036A96" "#0087ff" "blue")        ; official cyan
                 (dracula-green   "#14710A" "#00af00" "green")       ; official green
                 (dracula-orange  "#A34D14" "#ffaf5f" "red")         ; official orange

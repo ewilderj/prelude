@@ -24,6 +24,8 @@
 ;;   (prelude-theme 'dracula))
 
 (add-to-list 'custom-theme-load-path prelude-personal-dir)
+(setq dracula-light-bg "#FAF9F5") ;; Tone down the creaminess
+(setq dracula-light-comment "#6272A4") ;; Blue-grey comments (Original Alucard was #6C664B)
 (setq prelude-theme 'dracula-light)
 
 
