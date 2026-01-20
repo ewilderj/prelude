@@ -51,7 +51,7 @@
 
 (setq org-todo-keywords
       (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-              (sequence "WAITING(w)" "HOLD(h)" "|" "CANCELED(c)" "PHONE" "MEETING"))))
+              (sequence "WAITING(w)" "HOLD(h)" "PHONE" "MEETING" "|" "CANCELED(c)"))))
 
 (add-hook 'org-capture-mode-hook #'auto-fill-mode)
 
@@ -101,10 +101,12 @@
           ("u" "Super view" (
                              (agenda "" ((org-agenda-span 1)
                                          (org-super-agenda-groups
-                                          '((:name "Today"
+                                          '((:habit t)
+                                            (:log t)
+                                            (:name "Schedule"
                                                    :time-grid t)
-                                            (:habit t)
-                                            (:log t)))))
+                                            (:name "Events"
+                                                   :anything t)))))
 
                              (todo "" ((org-agenda-overriding-header "Next Actions")
                                        (org-super-agenda-groups
@@ -173,19 +175,90 @@
 
 (add-hook 'org-mode-hook #'ewj/org-fixed-pitch-tables)
 
-;; ;; ;; bump up in the scale in org-mode bc mixed-pitch-mode makes it small
-;; (defun ewj/org-mode-scale-text ()
-;;   "Apply a relative text scale increase for org-mode buffers."
-;;   (text-scale-increase 1))
+(defun ewj/find-meeting-context ()
+  "Find the current or next meeting from outlook.org and return a plist with details."
+  (let ((meetings '())
+        (now (current-time))
+        (today (format-time-string "%Y-%m-%d")))
+    (with-current-buffer (find-file-noselect "~/gtd/outlook.org")
+      (save-excursion
+        (goto-char (point-min))
+        (org-map-entries
+         (lambda ()
+           (let* ((element (org-element-at-point))
+                  (title (org-element-property :title element))
+                  (ts-str (org-entry-get nil "TIMESTAMP")))
+             (when (and ts-str (string-match today ts-str))
+               (let ((ts (org-parse-time-string ts-str)))
+                 (let ((start-time (apply #'encode-time ts))
+                       (end-time nil))
+                   (when (string-match "--\\([0-9]+:[0-9]+\\)" ts-str)
+                     (let ((end-str (match-string 1 ts-str)))
+                       (setq end-time (apply #'encode-time
+                                             (append (list 0
+                                                           (string-to-number (substring end-str 3 5))
+                                                           (string-to-number (substring end-str 0 2)))
+                                                     (nthcdr 3 ts))))))
+                   
+                   (unless end-time
+                     (if (equal (nth 2 ts) 0) 
+                         (setq end-time (time-add start-time (seconds-to-time 86399)))
+                       (setq end-time (time-add start-time (seconds-to-time 3600)))))
 
-;; (add-hook 'org-mode-hook #'ewj/org-mode-scale-text)
+                   ;; Get content (description) and properties
+                   ;; org-get-entry returns content including properties drawer.
+                   ;; We might want to keep the drawer.
+                   (let ((content (org-get-entry)) 
+                         (props (org-entry-properties)))
+                     (push (list :title title
+                                 :start start-time
+                                 :end end-time
+                                 :content content
+                                 :props props)
+                           meetings)))))))
+         t))) 
+    
+    (setq meetings (sort meetings (lambda (a b) (time-less-p (plist-get a :start) (plist-get b :start)))))
+    
+    (let ((current-meeting nil)
+          (next-meeting nil))
+      (dolist (m meetings)
+        (let ((start (plist-get m :start))
+              (end (plist-get m :end)))
+          (cond
+           ((and (or (time-less-p start now) (equal start now))
+                 (time-less-p now end))
+            (setq current-meeting m))
+           ((time-less-p now start)
+            (unless next-meeting (setq next-meeting m))))))
+      
+      (or current-meeting next-meeting))))
 
+(defun ewj/format-meeting-capture ()
+  "Format the meeting context for the capture template."
+  (let ((meeting (ewj/find-meeting-context)))
+    (if meeting
+        (let ((title (plist-get meeting :title))
+              (content (plist-get meeting :content)))
+          (format "* MEETING Notes: %s :meeting:\n%s" 
+                  title 
+                  (or content "")))
+      (format "* MEETING Notes: Quick Meeting :meeting:\n%s\n" 
+              (format-time-string "[%Y-%m-%d %a %H:%M]" (current-time))))))
 
+(defun ewj/capture-meeting-notes ()
+  "Capture notes for the current or next meeting."
+  (interactive)
+  (org-capture nil "M"))
 
 ;; personal strategy capture stuff
 (setq org-capture-templates
       (append org-capture-templates
-              '(("s" "Daily Strategy Card" entry
+              '(("M" "Meeting Notes" entry
+                 (file+headline "~/gtd/inbox.org" "Tasks")
+                 "%(ewj/format-meeting-capture)
+%?")
+                ("s" "Daily Strategy Card" entry
                  (file+olp+datetree "~/gtd/journal.org")
                  "* Daily Strategic Review: The Vital Three :strategy:
 %U
