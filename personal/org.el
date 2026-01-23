@@ -148,7 +148,12 @@
   :after org
   :ensure t
   :hook
-  (text-mode . mixed-pitch-mode)
+  (text-mode . ewj/maybe-mixed-pitch)
+  :init
+  (defun ewj/maybe-mixed-pitch ()
+    "Enable mixed-pitch-mode unless in yaml or similar modes."
+    (unless (derived-mode-p 'yaml-mode 'yaml-ts-mode)
+      (mixed-pitch-mode 1)))
   ;; :custom
   ;; (mixed-pitch-face 'ewj/reading-face)
   ;; (mixed-pitch-set-height t)

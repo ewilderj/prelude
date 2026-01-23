@@ -26,3 +26,10 @@
                       :weight 'regular))
 
 (setq ewilderj-condense-font "Zed Mono")
+
+;; Better emoji support - cover ranges that 'unicode alone misses
+(when (and (eq system-type 'darwin) (fboundp 'set-fontset-font))
+  (set-fontset-font t 'emoji "Apple Color Emoji" nil 'prepend)
+  (set-fontset-font t 'symbol "Apple Color Emoji" nil 'prepend)
+  ;; Explicit range for emoji blocks (Misc Symbols, Dingbats, Transport, etc.)
+  (set-fontset-font t '(#x1F300 . #x1F9FF) "Apple Color Emoji" nil 'prepend))
