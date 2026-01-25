@@ -1,4 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
+
+
 (use-package agent-shell
   :ensure t
   :demand t
@@ -19,8 +21,9 @@
   (advice-add 'agent-shell-github-make-copilot-config :filter-return #'my/shorten-copilot-prompt))
 
 ;; Markdown table alignment for agent-shell output
+
 (use-package markdown-tables
-  :after markdown-overlays
-  :load-path "personal/lib"
-  :config
-  (markdown-tables-enable))
+ :after markdown-overlays
+ :load-path "personal/lib"
+ :config
+ (markdown-tables-enable))

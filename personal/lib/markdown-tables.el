@@ -6,17 +6,20 @@
 
 ;;; Commentary:
 ;;
-;; Extends markdown-overlays to render markdown tables with proper column
-;; alignment. Uses overlay 'display properties to visually pad cells without
-;; modifying buffer content.
+;; Extends markdown-overlays to render markdown tables with:
+;; - Column alignment using overlay display properties
+;; - Automatic column wrapping when table exceeds window width
+;; - Unicode box-drawing borders (│ ─ ┼ ├ ┤)
+;; - Zebra striping for better row distinction
+;; - Bold headers, dimmed borders
 ;;
 ;; Before: | Name | Role |
 ;;         |------|------|
 ;;         | Alice Smith | Engineer |
 ;;
-;; After:  | Name        | Role     |
-;;         |-------------|----------|
-;;         | Alice Smith | Engineer |
+;; After:  │ Name        │ Role     │
+;;         ├─────────────┼──────────┤
+;;         │ Alice Smith │ Engineer │
 ;;
 ;; Usage: Simply load this file after markdown-overlays is available.
 ;; It advises `markdown-overlays-put' to also process tables.
@@ -43,6 +46,41 @@
   "When non-nil, use Unicode box-drawing characters for table borders.
 Replaces | with │, dashes with ─, and intersections with ┼."
   :type 'boolean
+  :group 'markdown-tables)
+
+(defcustom markdown-tables-wrap-columns t
+  "When non-nil, wrap table columns to fit within window width.
+Uses proportional shrinking with minimum widths based on longest word."
+  :type 'boolean
+  :group 'markdown-tables)
+
+(defcustom markdown-tables-max-width-fraction 0.9
+  "Fraction of window width to use as max table width.
+Only applies when `markdown-tables-wrap-columns' is non-nil."
+  :type 'float
+  :group 'markdown-tables)
+
+(defcustom markdown-tables-zebra-stripe t
+  "When non-nil, alternate row backgrounds for better readability."
+  :type 'boolean
+  :group 'markdown-tables)
+
+(defcustom markdown-tables-row-underline nil
+  "When non-nil, underline the last line of each data row.
+Helps distinguish row boundaries in wrapped tables."
+  :type 'boolean
+  :group 'markdown-tables)
+
+(defface markdown-tables-zebra-face
+  '((((background light)) :background "#f0f0f0" :foreground "#333333")
+    (((background dark)) :background "#2a2a2a" :foreground "#cccccc"))
+  "Face for alternating (even) rows in tables."
+  :group 'markdown-tables)
+
+(defface markdown-tables-row-face
+  '((((background light)) :foreground "#555555")
+    (((background dark)) :foreground "#aaaaaa"))
+  "Face for regular (odd) data rows in tables."
   :group 'markdown-tables)
 
 (defconst markdown-tables--border-pipe "│"
@@ -82,7 +120,7 @@ Replaces | with │, dashes with ─, and intersections with ┼."
 
 (defun markdown-tables--find-tables (&optional avoid-ranges)
   "Find all markdown tables in the buffer.
-Returns a list of plists with :start, :end, :header-end, and :rows.
+Returns a list of plists with :start, :end, :separator-row, and :rows.
 AVOID-RANGES is a list of (start . end) cons to skip."
   (let ((tables '()))
     (save-excursion
@@ -169,6 +207,64 @@ Returns a list of integers, one per column."
               (setq col (1+ col)))))))
     widths))
 
+(defun markdown-tables--compute-min-column-widths (table)
+  "Compute minimum width for each column in TABLE.
+Minimum is the longest single word in the column (to avoid breaking words)."
+  (let ((min-widths nil))
+    (dolist (row (plist-get table :rows))
+      (unless (plist-get row :separator)
+        (let ((cells (markdown-tables--parse-row
+                      (plist-get row :start)
+                      (plist-get row :end)))
+              (col 0))
+          (dolist (cell cells)
+            (let ((longest-word (markdown-tables--longest-word
+                                 (plist-get cell :content))))
+              (if (nth col min-widths)
+                  (setf (nth col min-widths)
+                        (max (nth col min-widths) longest-word))
+                (setq min-widths (append min-widths (list longest-word))))
+              (setq col (1+ col)))))))
+    min-widths))
+
+(defun markdown-tables--longest-word (str)
+  "Return length of longest word in STR."
+  (if (or (null str) (string-empty-p str))
+      0
+    (apply #'max (mapcar #'length (split-string str "[ \t\n]+" t)))))
+
+(defun markdown-tables--total-width (widths)
+  "Calculate total rendered width for WIDTHS including borders and padding."
+  ;; Each column: content + 2 spaces padding + 1 pipe. Plus 1 pipe at start.
+  (+ 1 (seq-reduce (lambda (acc w) (+ acc w 3)) widths 0)))
+
+(defun markdown-tables--allocate-widths (natural-widths min-widths target)
+  "Shrink NATURAL-WIDTHS proportionally to fit TARGET, respecting MIN-WIDTHS."
+  (let* ((total (markdown-tables--total-width natural-widths))
+         (excess (- total target)))
+    (if (<= excess 0)
+        natural-widths  ; Fits already
+      ;; Calculate how much each column can shrink
+      (let* ((shrinkable (seq-mapn (lambda (w m) (max 0 (- w m)))
+                                   natural-widths min-widths))
+             (total-shrinkable (seq-reduce #'+ shrinkable 0)))
+        (if (<= total-shrinkable 0)
+            min-widths  ; Can't shrink further
+          (let ((ratio (min 1.0 (/ (float excess) total-shrinkable))))
+            (seq-mapn (lambda (w m s)
+                        (max m (floor (- w (* s ratio)))))
+                      natural-widths min-widths shrinkable)))))))
+
+(defun markdown-tables--wrap-text (text width)
+  "Wrap TEXT to fit within WIDTH, returning list of lines."
+  (if (or (null text) (<= (length text) width))
+      (list (or text ""))
+    (with-temp-buffer
+      (insert text)
+      (let ((fill-column width))
+        (fill-region (point-min) (point-max)))
+      (split-string (buffer-string) "\n"))))
+
 (defun markdown-tables--pad-string (str width)
   "Pad STR with spaces to reach WIDTH."
   (let ((current-width (string-width str)))
@@ -183,70 +279,163 @@ Returns a list of integers, one per column."
     (make-string width ?-)))
 
 (defun markdown-tables--align-table (table)
-  "Apply display overlays to align TABLE columns."
-  (let* ((col-widths (markdown-tables--compute-column-widths table))
+  "Apply display overlays to align TABLE columns.
+If `markdown-tables-wrap-columns' is non-nil and table is too wide,
+columns are wrapped to fit within window width."
+  (let* ((natural-widths (markdown-tables--compute-column-widths table))
+         (min-widths (markdown-tables--compute-min-column-widths table))
+         (target-width (when markdown-tables-wrap-columns
+                         (floor (* (window-body-width)
+                                   markdown-tables-max-width-fraction))))
+         (total-natural (markdown-tables--total-width natural-widths))
+         (col-widths (if (and markdown-tables-wrap-columns
+                              target-width
+                              (> total-natural target-width))
+                         (markdown-tables--allocate-widths
+                          natural-widths min-widths target-width)
+                       natural-widths))
+         (needs-wrapping (not (equal col-widths natural-widths)))
          (separator-row (plist-get table :separator-row))
-         (rows (plist-get table :rows)))
-    
+         (rows (plist-get table :rows))
+         (data-row-num 0))  ; Track data rows for zebra striping
+
     (dolist (row rows)
       (let* ((row-start (plist-get row :start))
              (row-end (plist-get row :end))
              (row-num (plist-get row :num))
              (is-separator (plist-get row :separator))
              (is-header (and separator-row (< row-num separator-row)))
-             (cells (markdown-tables--parse-row row-start row-end))
-             (col 0))
-        
-        (dolist (cell cells)
-          (let* ((cell-start (plist-get cell :start))
-                 (cell-end (plist-get cell :end))
-                 (content (plist-get cell :content))
-                 (target-width (or (nth col col-widths) (string-width content)))
-                 (padded-content
-                  (if is-separator
-                      ;; For separator rows, fill entire cell with dashes (no spaces)
-                      (markdown-tables--make-separator-cell (+ target-width 2))
-                    ;; For content rows, pad with spaces
-                    (concat " " (markdown-tables--pad-string content target-width) " ")))
-                 (display-str padded-content)
-                 (ov (make-overlay cell-start cell-end)))
-            
-            ;; Apply face to the display string
-            (when is-header
-              (setq display-str (propertize display-str 'face markdown-tables-header-face)))
-            (when is-separator
-              (setq display-str (propertize display-str 'face markdown-tables-border-face)))
-            
-            ;; Use 'display property to show aligned content
+             (is-zebra (and markdown-tables-zebra-stripe
+                            (not is-header)
+                            (not is-separator)
+                            (= (mod data-row-num 2) 1)))
+             (cells (markdown-tables--parse-row row-start row-end)))
+
+        ;; Increment data row counter for non-header, non-separator rows
+        (unless (or is-header is-separator)
+          (setq data-row-num (1+ data-row-num)))
+
+        (if (and (not is-separator) (not needs-wrapping))
+            ;; Simple case: no wrapping needed and not separator
+            (let ((col 0))
+              (dolist (cell cells)
+                (let* ((cell-start (plist-get cell :start))
+                       (cell-end (plist-get cell :end))
+                       (content (plist-get cell :content))
+                       (cell-width (or (nth col col-widths) (string-width content)))
+                       (padded-content
+                        (concat " " (markdown-tables--pad-string content cell-width) " "))
+                       (display-str (cond
+                                     (is-header
+                                      (propertize padded-content 'face markdown-tables-header-face))
+                                     (is-zebra
+                                      (propertize padded-content 'face 'markdown-tables-zebra-face))
+                                     (t
+                                      (propertize padded-content 'face 'markdown-tables-row-face))))
+                       (ov (make-overlay cell-start cell-end)))
+                  (overlay-put ov 'category 'markdown-overlays)
+                  (overlay-put ov 'evaporate t)
+                  (overlay-put ov 'display display-str)
+                  (setq col (1+ col)))))
+
+          ;; Wrapping case OR separator row - render as complete row overlay
+          (if is-separator
+              ;; Separator row
+              (let* ((pipe (if markdown-tables-use-unicode-borders
+                               markdown-tables--border-cross "|"))
+                     (pipe-left (if markdown-tables-use-unicode-borders
+                                    markdown-tables--border-tee-left "|"))
+                     (pipe-right (if markdown-tables-use-unicode-borders
+                                     markdown-tables--border-tee-right "|"))
+                     ;; Preserve leading whitespace
+                     (leading-ws (save-excursion
+                                   (goto-char row-start)
+                                   (if (looking-at "^[ \t]*")
+                                       (match-string 0) "")))
+                     (row-display
+                      (concat
+                       leading-ws
+                       (propertize pipe-left 'face markdown-tables-border-face)
+                       (mapconcat
+                        (lambda (idx)
+                          (let ((width (nth idx col-widths)))
+                            (propertize (markdown-tables--make-separator-cell (+ width 2))
+                                        'face markdown-tables-border-face)))
+                        (number-sequence 0 (1- (length col-widths)))
+                        (propertize pipe 'face markdown-tables-border-face))
+                       (propertize pipe-right 'face markdown-tables-border-face)))
+                     (ov (make-overlay row-start row-end)))
+                (overlay-put ov 'category 'markdown-overlays)
+                (overlay-put ov 'evaporate t)
+                (overlay-put ov 'display row-display))
+
+          ;; Complex case: wrapping needed
+          (let* ((wrapped-cells
+                  (seq-map-indexed
+                   (lambda (cell idx)
+                     (let ((width (or (nth idx col-widths) 10)))
+                       (markdown-tables--wrap-text
+                        (plist-get cell :content) width)))
+                   cells))
+                 (max-lines (apply #'max 1 (mapcar #'length wrapped-cells)))
+                 (pipe (if markdown-tables-use-unicode-borders
+                           markdown-tables--border-pipe "|"))
+                 (styled-pipe (propertize pipe 'face markdown-tables-border-face))
+                 ;; Preserve leading whitespace
+                 (leading-ws (save-excursion
+                               (goto-char row-start)
+                               (if (looking-at "^[ \t]*")
+                                   (match-string 0) "")))
+                 ;; Build multi-line display string for entire row
+                 (row-display
+                  (mapconcat
+                   (lambda (line-idx)
+                     (let ((is-last-line (= line-idx (1- max-lines))))
+                       (concat
+                        leading-ws
+                        styled-pipe
+                        (mapconcat
+                         (lambda (col-idx)
+                           (let* ((cell-lines (nth col-idx wrapped-cells))
+                                  (width (nth col-idx col-widths))
+                                  (line (or (nth line-idx cell-lines) ""))
+                                  (padded (concat " "
+                                                  (markdown-tables--pad-string line width)
+                                                  " "))
+                                  (base-face (cond
+                                              (is-header 'markdown-tables-header-face)
+                                              (is-zebra 'markdown-tables-zebra-face)
+                                              (t 'markdown-tables-row-face)))
+                                  (final-face (if (and markdown-tables-row-underline
+                                                       is-last-line
+                                                       (not is-header))
+                                                  (list base-face '(:underline t))
+                                                base-face)))
+                             (propertize padded 'face final-face)))
+                         (number-sequence 0 (1- (length cells)))
+                         styled-pipe)
+                        styled-pipe)))
+                   (number-sequence 0 (1- max-lines))
+                   "\n"))
+                 ;; Create overlay for entire row (including pipes)
+                 (ov (make-overlay row-start row-end)))
             (overlay-put ov 'category 'markdown-overlays)
             (overlay-put ov 'evaporate t)
-            (overlay-put ov 'display display-str)
-            
-            (setq col (1+ col))))
-        
-        ;; Style pipe characters - replace with Unicode if enabled
-        ;; Track position to use correct tee/cross characters
-        (save-excursion
-          (goto-char row-start)
-          (let ((pipe-num 0)
-                (total-pipes (how-many "|" row-start row-end)))
+            (overlay-put ov 'display row-display))))
+
+        ;; Style pipe characters at row boundaries (only for simple non-wrapped rows)
+        (when (and (not is-separator) (not needs-wrapping))
+          (save-excursion
+            (goto-char row-start)
             (while (re-search-forward "|" row-end t)
-              (setq pipe-num (1+ pipe-num))
-              (let ((ov (make-overlay (1- (point)) (point)))
-                    (is-first (= pipe-num 1))
-                    (is-last (= pipe-num total-pipes)))
+              (let ((ov (make-overlay (1- (point)) (point))))
                 (overlay-put ov 'category 'markdown-overlays)
                 (overlay-put ov 'evaporate t)
                 (overlay-put ov 'face markdown-tables-border-face)
                 (when markdown-tables-use-unicode-borders
                   (overlay-put ov 'display
-                               (propertize
-                                (if is-separator
-                                    (cond (is-first markdown-tables--border-tee-left)
-                                          (is-last markdown-tables--border-tee-right)
-                                          (t markdown-tables--border-cross))
-                                  markdown-tables--border-pipe)
-                                'face markdown-tables-border-face)))))))))))
+                               (propertize markdown-tables--border-pipe
+                                           'face markdown-tables-border-face)))))))))))
 
 (defun markdown-tables--fontify-all (&optional avoid-ranges)
   "Find and align all markdown tables, avoiding AVOID-RANGES."
