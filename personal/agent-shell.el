@@ -1,7 +1,17 @@
 ;;; -*- lexical-binding: t; -*-
 (use-package agent-shell
   :ensure t
+  :demand t
   :ensure-system-package
   ;; Add agent installation configs here
   ()
+  :config
+  ;; Shorten the Copilot prompt from "Copilot> " to " "
+  (defun my/shorten-copilot-prompt (config)
+    "Replace Copilot prompt with a shorter one."
+    (when (eq (alist-get :identifier config) 'copilot)
+      (setf (alist-get :shell-prompt config) " ❯ ")
+      (setf (alist-get :shell-prompt-regexp config) " ❯ "))
+    config)
+  (advice-add 'agent-shell-github-make-copilot-config :filter-return #'my/shorten-copilot-prompt)
   )
