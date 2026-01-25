@@ -23,7 +23,7 @@
 ;; Markdown table alignment for agent-shell output
 
 (use-package markdown-tables
- :after markdown-overlays
- :load-path "personal/lib"
- :config
- (markdown-tables-enable))
+  :after markdown-overlays
+  :load-path "personal/lib"
+  :config
+  (markdown-tables-enable))
