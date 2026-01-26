@@ -22,8 +22,10 @@
 
 ;; Markdown table alignment for agent-shell output
 
-(use-package markdown-tables
-  :after markdown-overlays
-  :load-path "personal/lib"
-  :config
-  (markdown-tables-enable))
+(load-file "~/.emacs.d/personal/markdown-overlays.el")
+
+;;(use-package markdown-tables
+;;  :after markdown-overlays
+;;  :load-path "personal/lib"
+;;  :config
+;;  (markdown-tables-enable))
