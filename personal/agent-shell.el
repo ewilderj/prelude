@@ -8,8 +8,7 @@
   ;; Add agent installation configs here
   ()
   :custom
-  (agent-shell-github-command '("/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js" "--acp" "--model" "claude-opus-4.5"))
-;;  (agent-shell-github-command '("copilot" "--acp" "--model" "claude-opus-4.5"))
+  (agent-shell-github-command '("copilot" "--acp" "--model" "claude-opus-4.5"))
   :config
   ;; Shorten the Copilot prompt from "Copilot> " to " ❯ "
   (defun my/shorten-copilot-prompt (config)
