@@ -23,8 +23,11 @@
 
 (load-file "~/.emacs.d/personal/lib/markdown-overlays.el")
 
-;;(use-package markdown-tables
-;;  :after markdown-overlays
-;;  :load-path "personal/lib"
-;;  :config
-;;  (markdown-tables-enable))
+(use-package markdown-tables
+  :after markdown-overlays
+  :load-path "personal/lib"
+  :config
+  (markdown-tables-enable))
+
+;; Disable line numbers in agent-shell buffers
+(add-hook 'agent-shell-mode-hook (lambda () (display-line-numbers-mode -1)))
