@@ -24,9 +24,17 @@
 ;;   (prelude-theme 'dracula))
 
 (add-to-list 'custom-theme-load-path prelude-personal-dir)
-(setq dracula-light-bg "#FAF9F5") ;; Tone down the creaminess
-(setq dracula-light-comment "#6272A4") ;; Blue-grey comments (Original Alucard was #6C664B)
-(setq prelude-theme 'dracula-light)
+
+;; Use dracula-light in graphical mode, regular dracula in terminal
+(if (display-graphic-p)
+    (progn
+      (setq dracula-light-bg "#FAF9F5") ;; Tone down the creaminess
+      (setq dracula-light-comment "#6272A4") ;; Blue-grey comments
+      (setq prelude-theme 'dracula-light))
+  (use-package dracula-theme
+    :ensure t
+    :straight (:host github :repo "dracula/emacs" :files ("*.el")))
+  (setq prelude-theme 'dracula))
 
 
 ;; (use-package dracula-light-theme

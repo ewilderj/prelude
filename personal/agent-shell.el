@@ -22,7 +22,7 @@
 
 ;; Markdown table alignment for agent-shell output
 
-(load-file "~/.emacs.d/personal/markdown-overlays.el")
+(load-file "~/.emacs.d/personal/lib/markdown-overlays.el")
 
 ;;(use-package markdown-tables
 ;;  :after markdown-overlays
