@@ -28,8 +28,19 @@
 (setq ewilderj-condense-font "Zed Mono")
 
 ;; Better emoji support - cover ranges that 'unicode alone misses
-(when (and (eq system-type 'darwin) (fboundp 'set-fontset-font))
-  (set-fontset-font t 'emoji "Apple Color Emoji" nil 'prepend)
-  (set-fontset-font t 'symbol "Apple Color Emoji" nil 'prepend)
-  ;; Explicit range for emoji blocks (Misc Symbols, Dingbats, Transport, etc.)
-  (set-fontset-font t '(#x1F300 . #x1F9FF) "Apple Color Emoji" nil 'prepend))
+;; Must be deferred for server mode (no frame exists at preload time)
+(defun ewilderj-setup-emoji-fonts (&optional _frame)
+  "Set up emoji fonts. Works in both daemon and normal startup."
+  (when (and (eq system-type 'darwin) (fboundp 'set-fontset-font))
+    (set-fontset-font t 'emoji "Apple Color Emoji" nil 'prepend)
+    (set-fontset-font t 'symbol "Apple Color Emoji" nil 'prepend)
+    ;; Explicit range for emoji blocks (Misc Symbols, Dingbats, Transport, etc.)
+    (set-fontset-font t '(#x1F300 . #x1F9FF) "Apple Color Emoji" nil 'prepend)
+    ;; Nerd Fonts grabs these - force Apple Color Emoji
+    (dolist (cp '(#x1F6E0 #x1F6E1 #x1F6E2 #x1F6E3 #x1F6E4 #x1F6E5
+                  #x1F6E9 #x1F6F0 #x1F6F3))
+      (set-fontset-font t cp "Apple Color Emoji" nil 'prepend))))
+
+(if (daemonp)
+    (add-hook 'after-make-frame-functions #'ewilderj-setup-emoji-fonts)
+  (ewilderj-setup-emoji-fonts))
