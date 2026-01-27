@@ -38,3 +38,5 @@ org-persist/
 projects
 forge-database.sqlite
 persist/ement-room-list-visibility-cache
+.agent-shell/
+projects.eld
