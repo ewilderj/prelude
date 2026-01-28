@@ -103,6 +103,8 @@
 (advice-add 'agent-shell--status-label :around #'my/agent-shell-status-icons)
 
 ;; PATCH: Replace verbose kind labels with icons
+;; Spec kinds: read, edit, delete, move, search, execute, think, fetch, switch_mode, other
+;; See: https://docs.rs/agent-client-protocol/latest/agent_client_protocol/enum.ToolKind.html
 (defun my/agent-shell-kind-icons (orig-fn state tool-call-id)
   "Replace verbose kind labels with compact icons in tool-call labels."
   (let ((result (funcall orig-fn state tool-call-id)))
@@ -110,10 +112,16 @@
       (when-let* ((tool-call (map-nested-elt state `(:tool-calls ,tool-call-id)))
                   (kind (map-elt tool-call :kind)))
         (let ((icon (pcase kind
-                      ("execute" "⚡")
                       ("read" "👁")
-                      ("write" "📝")
                       ("edit" "✏️")
+                      ("delete" "🗑")
+                      ("move" "📦")
+                      ("search" "🔍")
+                      ("execute" "⚡")
+                      ("think" "💭")
+                      ("fetch" "🌐")
+                      ("switch_mode" "🔀")
+                      ("other" "•")
                       (_ nil))))
           (when (and icon (alist-get :status result))
             (setf (alist-get :status result)
