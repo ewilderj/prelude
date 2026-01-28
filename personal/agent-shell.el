@@ -54,41 +54,6 @@
 
 (advice-add 'agent-shell--update-fragment :around #'my/agent-shell-show-command)
 
-;; PATCH: Replace "view"/"grep"/"edit" title with useful info from rawInput
-;; Copilot sends path/pattern in rawInput, not in title/description
-(define-advice agent-shell--on-notification (:around (orig-fn &rest args) inject-rawInput-title)
-  "Replace generic titles with useful info when rawInput has details."
-  (let* ((plist args)
-         (notification (plist-get plist :notification)))
-    (when notification
-      (let-alist notification
-        (when (equal .method "session/update")
-          (let* ((update (map-elt (map-elt notification 'params) 'update))
-                 (title (map-elt update 'title))
-                 (raw-input (map-elt update 'rawInput)))
-            (when (equal (map-elt update 'sessionUpdate) "tool_call")
-              (cond
-               ;; view → full path
-               ((and (equal title "view")
-                     (map-elt raw-input 'path))
-                (setf (alist-get 'title update)
-                      (map-elt raw-input 'path)))
-               ;; grep → pattern + full path
-               ((and (equal title "grep")
-                     (map-elt raw-input 'pattern))
-                (let ((pattern (map-elt raw-input 'pattern))
-                      (path (map-elt raw-input 'path)))
-                  (setf (alist-get 'title update)
-                        (if path
-                            (format "/%s/ %s" pattern path)
-                          (format "/%s/" pattern)))))
-               ;; edit → full path
-               ((and (equal title "edit")
-                     (map-elt raw-input 'path))
-                (setf (alist-get 'title update)
-                      (map-elt raw-input 'path))))))))))
-  (apply orig-fn args))
-
 ;; PATCH: Replace verbose status labels with icons
 (defun my/agent-shell-status-icons (orig-fn status)
   "Replace verbose status labels with compact icons."
@@ -123,7 +88,7 @@
                       ("think" "💭")
                       ("fetch" "🌐")
                       ("switch_mode" "🔀")
-                      ("other" "•")
+                      ("other" "🔧")
                       (_ nil))))
           (when (and icon (alist-get :status result))
             (setf (alist-get :status result)
