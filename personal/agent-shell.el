@@ -8,8 +8,10 @@
   ;; Add agent installation configs here
   ()
   :custom
-  (agent-shell-github-command '("node" "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js" "--acp" "--model" "claude-opus-4.5"))
-  ;; (agent-shell-github-command '("copilot" "--acp" "--model" "claude-opus-4.5"))
+  (agent-shell-github-command
+   (if (file-exists-p "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js")
+       '("node" "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js" "--acp" "--model" "claude-opus-4.5")
+     '("copilot" "--acp" "--model" "claude-opus-4.5")))
   :config
   ;; Shorten the Copilot prompt from "Copilot> " to " ❯ "
   (defun my/shorten-copilot-prompt (config)
@@ -112,7 +114,7 @@
       (when-let* ((tool-call (map-nested-elt state `(:tool-calls ,tool-call-id)))
                   (kind (map-elt tool-call :kind)))
         (let ((icon (pcase kind
-                      ("read" "👁")
+                      ("read" "📖")
                       ("edit" "✏️")
                       ("delete" "🗑")
                       ("move" "📦")
