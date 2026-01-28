@@ -129,7 +129,7 @@ The theme has to be reloaded after changing anything in this group."
                (shadow :foreground ,dracula-comment)
                (success :foreground ,dracula-green)
                (tooltip :foreground ,dracula-fg :background ,dracula-current)
-               (trailing-whitespace :background ,dracula-orange)
+               (trailing-whitespace :background ,dracula-current)
                (vertical-border :foreground ,bg2)
                (warning :foreground ,dracula-orange)
                ;; syntax / font-lock
