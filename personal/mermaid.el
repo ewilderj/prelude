@@ -23,3 +23,9 @@
 
 ;; Display images inline after babel execution
 (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+
+;; Don't prompt for confirmation on safe languages
+(add-to-list 'org-babel-default-header-args:mermaid '(:eval . "yes"))
+(setq org-confirm-babel-evaluate
+      (lambda (lang _body)
+        (not (string= lang "mermaid"))))
