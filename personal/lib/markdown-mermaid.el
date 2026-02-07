@@ -190,9 +190,7 @@ any markdown-overlays overlays that overlap the mermaid blocks."
   "Disable mermaid diagram rendering."
   (interactive)
   (setq markdown-mermaid--enabled nil)
-  (advice-remove 'markdown-overlays-put :after #'markdown-mermaid--after-fontify)
-  ;; Also remove the old :around advice if present
-  (advice-remove 'markdown-overlays-put #'markdown-mermaid--around-fontify)
+  (advice-remove 'markdown-overlays-put #'markdown-mermaid--after-fontify)
   (message "Markdown mermaid rendering disabled"))
 
 (provide 'markdown-mermaid)
