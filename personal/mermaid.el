@@ -29,3 +29,13 @@
 (setq org-confirm-babel-evaluate
       (lambda (lang _body)
         (not (string= lang "mermaid"))))
+
+;; md-mermaid: live overlay rendering in markdown buffers
+(use-package md-mermaid
+  :straight (:host github :repo "ahmetus/md-mermaid")
+  :commands (md-mermaid-render-current
+             md-mermaid-transient
+             md-mermaid-live-mode)
+  :config
+  (md-mermaid-keybindings-mode 1)
+  (setq md-mermaid-default-preset 'png1400))
