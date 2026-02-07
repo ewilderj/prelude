@@ -32,13 +32,11 @@
 
 ;; md-mermaid: live overlay rendering in markdown buffers
 (use-package md-mermaid
-  :straight (:host github :repo "ahmetus/md-mermaid")
+  :straight (:host github :repo "ahmetus/md-mermaid"
+             :files ("*.el" "scripts"))
   :commands (md-mermaid-render-current
              md-mermaid-transient
              md-mermaid-live-mode)
   :config
   (md-mermaid-keybindings-mode 1)
-  (setq md-mermaid-default-preset 'png1400)
-  (setq md-mermaid-snippet-renderer-path
-        (expand-file-name "straight/repos/md-mermaid/scripts/md_mermaid_snippet.py"
-                          user-emacs-directory)))
+  (setq md-mermaid-default-preset 'png1400))
