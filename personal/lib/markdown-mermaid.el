@@ -32,10 +32,8 @@
   :type 'string
   :group 'markdown-mermaid)
 
-(defcustom markdown-mermaid-theme "neutral"
-  "Mermaid theme to use for rendering.
-The `neutral' theme produces cleaner, less saturated diagrams
-that blend better with editor text."
+(defcustom markdown-mermaid-theme "default"
+  "Mermaid theme to use for rendering."
   :type '(choice (const "default") (const "forest") (const "dark") (const "neutral"))
   :group 'markdown-mermaid)
 
