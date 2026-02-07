@@ -20,3 +20,6 @@
   (setq ob-mermaid-cli-path (executable-find "mmdc"))
   (add-to-list 'org-babel-load-languages '(mermaid . t))
   (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages))
+
+;; Display images inline after babel execution
+(add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
