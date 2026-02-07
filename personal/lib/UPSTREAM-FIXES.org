@@ -1,0 +1,111 @@
+#+TITLE: Local fixes to upstream packages
+#+AUTHOR: Edd Wilder-James
+
+Notes on local patches applied to vendored upstream code in personal/lib/.
+These should be submitted upstream when ready.
+
+* markdown-overlays.el (xenodium/shell-maker)
+
+Our copy: =~/.emacs.d/personal/lib/markdown-overlays.el=
+Upstream: https://github.com/xenodium/shell-maker (=shell-maker-markdown-overlays.el=)
+Related PR: https://github.com/xenodium/shell-maker/pull/17
+
+** Bug: inline-code styling breaks after code fences
+
+*** Symptoms
+
+After a fenced code block (e.g. =```python ... ```=), all subsequent
+inline-code styling is inverted — text between backtick-quoted spans
+is rendered as code, and actual =`code`= spans are rendered as normal
+text. This continues until the next code fence "resets" it.
+
+*** Root cause
+
+The inline-code regex =`[^`]+`= treats the backticks in the closing
+fence marker =```= as inline-code delimiters. When the regex engine
+encounters the =```= at the end of a code block, it matches the last
+backtick as an opening delimiter, then scans forward until it finds the
+next backtick (which may be in a legitimate =`inline code`= span or
+the next fence). This creates a spurious inline-code match that spans
+from the closing fence into the following prose, consuming and
+mis-styling everything in between.
+
+*** Fix (two changes + one behavioral fix)
+
+All changes are in =markdown-overlays-put= and
+=markdown-overlays--markdown-inline-codes=.
+
+**** 1. Expand source-block-ranges to cover fence markers
+
+The =source-block-ranges= variable was computed from the =body= field
+of each source block, which only covers the content between the fences
+(excluding the =```= lines themselves). Changed to use the full block
+extent from the =start= of the opening fence to the =end= of the
+closing fence.
+
+#+begin_src diff
+  (source-block-ranges (seq-map (lambda (block)
+-                                  (map-elt block 'body))
++                                  (cons (car (map-elt block 'start))
++                                        (cdr (map-elt block 'end))))
+                                 source-blocks))
+#+end_src
+
+**** 2. Fix overlap detection in avoid-ranges check
+
+The original avoid check required the /entire/ inline-code match to be
+inside an avoid range (=begin >= start AND end <= end=). This missed
+matches that started at the boundary of one range and extended into
+prose. Changed to proper interval overlap detection: two intervals
+overlap unless one is entirely before the other.
+
+#+begin_src diff
+-            (unless (seq-find (lambda (avoided)
+-                                (and (>= begin (car avoided))
+-                                     (<= end (cdr avoided))))
+-                              avoid-ranges)
++            (if-let ((avoided (seq-find (lambda (avoided)
++                                          (not (or (> begin (cdr avoided))
++                                                   (< end (car avoided)))))
++                                        avoid-ranges)))
++                (goto-char (1+ (cdr avoided)))
+#+end_src
+
+**** 3. Resume scanning after avoided match
+
+When the original code rejected an avoided match, =re-search-forward=
+continued from the /end/ of the rejected match. This skipped over
+legitimate inline-code spans that followed. For example, if the regex
+matched from the closing =```= to the opening backtick of
+=`random.choice`=, rejecting the match left the cursor past
+=random.choice= entirely.
+
+Fix: when a match overlaps an avoid range, move point to just past the
+end of the avoid range (=goto-char (1+ (cdr avoided))=) so the regex
+retries from after the code block and finds legitimate inline codes.
+
+*** How to reproduce
+
+Any markdown buffer with a fenced code block followed by text
+containing backtick-quoted inline code:
+
+#+begin_example
+```python
+print("hello")
+```
+
+This uses `random.choice` to pick an item.
+#+end_example
+
+Without the fix, =random.choice= is not styled as inline code, and
+the text between =```= and the backtick is incorrectly styled.
+
+*** Upstream submission notes
+
+- These are minimal, self-contained changes to =markdown-overlays-put=
+  and =markdown-overlays--markdown-inline-codes=
+- No new dependencies or features, pure bugfix
+- The fix is conservative: it only changes avoid-range handling, not
+  the inline-code regex itself
+- Tested in agent-shell (gptel/chatgpt-shell) with mixed code fences,
+  mermaid blocks, and inline code
