@@ -30,13 +30,32 @@
       (lambda (lang _body)
         (not (string= lang "mermaid"))))
 
+
+;; Tree-sitter markdown grammar (used by md-mermaid-live for fence detection)
+(add-to-list 'treesit-language-source-alist
+             '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+                        "split_parser" "tree-sitter-markdown/src"))
+(unless (treesit-language-available-p 'markdown)
+  (treesit-install-language-grammar 'markdown))
+
 ;; md-mermaid: live overlay rendering in markdown buffers
+;; LOCAL FIX: md-mermaid-live--ts-build-block has a bug where :pos uses
+;; code-end (last code line) instead of block-end (closing fence line),
+;; causing tree-sitter renders to always be marked "stale".
+;; Fix: in md-mermaid-live.el, remove the `pos` let-binding and set
+;; :pos to block-end.
+;; LOCAL FIX: md-mermaid-live--ensure-overlay fails to reuse overlays
+;; after edits that shift buffer positions (stored md-mermaid-pos goes
+;; stale). Fix: add (= (overlay-start o) pos) fallback to the
+;; seq-find match in ensure-overlay.
+;; See https://github.com/ahmetus/md-mermaid/issues/1
 (use-package md-mermaid
   :straight (:host github :repo "ahmetus/md-mermaid"
              :files ("*.el" "scripts"))
   :commands (md-mermaid-render-current
              md-mermaid-transient
              md-mermaid-live-mode)
-  :config
+  :init
   (md-mermaid-keybindings-mode 1)
+  :config
   (setq md-mermaid-default-preset 'png1400))

@@ -9,9 +9,9 @@
   ()
   :custom
   (agent-shell-github-command
-   (if (file-exists-p "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js")
+   (if (file-exists-p "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.jsFOO")
        '("node" "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js" "--acp" "--model" "claude-opus-4.5")
-     '("copilot" "--acp" "--model" "claude-opus-4.5")))
+     '("copilot" "--yolo" "--acp" "--model" "claude-opus-4.6" )))
   :config
   ;; Shorten the Copilot prompt from "Copilot> " to " ❯ "
   (defun my/shorten-copilot-prompt (config)
@@ -31,6 +31,12 @@
   :load-path "personal/lib"
   :config
   (markdown-tables-enable))
+
+(use-package markdown-mermaid
+  :after markdown-overlays
+  :load-path "personal/lib"
+  :config
+  (markdown-mermaid-enable))
 
 ;; Disable line numbers in agent-shell buffers
 (add-hook 'agent-shell-mode-hook (lambda () (display-line-numbers-mode -1)))
