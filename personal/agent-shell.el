@@ -25,6 +25,7 @@
 ;; Markdown table alignment for agent-shell output
 
 (load-file "~/.emacs.d/personal/lib/markdown-overlays.el")
+(setq markdown-overlays-insert-dividers t)
 
 (use-package markdown-tables
   :after markdown-overlays
