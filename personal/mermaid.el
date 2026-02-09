@@ -2,6 +2,10 @@
 
 ;; Requires: brew install mermaid-cli
 
+;; Puppeteer (used by mmdc) needs Chrome - set path for GUI Emacs
+(setenv "PUPPETEER_EXECUTABLE_PATH"
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+
 (defun ewj/check-mmdc-installed ()
   "Check that mmdc (mermaid-cli) is available."
   (unless (executable-find "mmdc")
@@ -58,4 +62,6 @@
   :init
   (md-mermaid-keybindings-mode 1)
   :config
-  (setq md-mermaid-default-preset 'png1400))
+  (setq md-mermaid-default-preset 'png1400)
+  ;; Match diagram background to Emacs theme
+  (setq md-mermaid-live-background (face-background 'default)))

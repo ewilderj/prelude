@@ -37,10 +37,15 @@
   :type '(choice (const "default") (const "forest") (const "dark") (const "neutral"))
   :group 'markdown-mermaid)
 
-(defcustom markdown-mermaid-background "white"
-  "Background color for rendered diagrams."
-  :type 'string
+(defcustom markdown-mermaid-background nil
+  "Background color for rendered diagrams.
+If nil, uses the current Emacs default face background."
+  :type '(choice (const :tag "Match Emacs theme" nil) string)
   :group 'markdown-mermaid)
+
+(defun markdown-mermaid--background ()
+  "Return the background color to use for diagrams."
+  (or markdown-mermaid-background (face-background 'default) "white"))
 
 (defcustom markdown-mermaid-scale 2
   "Render scale factor for mermaid diagrams.
@@ -75,7 +80,9 @@ If exceeded, rendering is skipped and a warning is logged."
 Uses cache to avoid re-rendering identical content.
 Renders at `markdown-mermaid-scale'x resolution for crisp display.
 Aborts if rendering takes longer than `markdown-mermaid-render-timeout'."
-  (let* ((sig (secure-hash 'sha1 (concat content "|" markdown-mermaid-theme
+  (let* ((bg (markdown-mermaid--background))
+         (sig (secure-hash 'sha1 (concat content "|" markdown-mermaid-theme
+                                          "|" bg
                                           "|" (number-to-string markdown-mermaid-scale))))
          (cached (gethash sig markdown-mermaid--cache)))
     (if (and cached (file-exists-p cached))
@@ -90,7 +97,7 @@ Aborts if rendering takes longer than `markdown-mermaid-render-timeout'."
                                      "-i" input-file
                                      "-o" output-file
                                      "-t" markdown-mermaid-theme
-                                     "-b" markdown-mermaid-background
+                                     "-b" bg
                                      "-s" (number-to-string markdown-mermaid-scale)
                                      "--quiet"))
                (deadline (+ (float-time) markdown-mermaid-render-timeout)))
