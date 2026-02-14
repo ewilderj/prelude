@@ -913,7 +913,7 @@ The theme has to be reloaded after changing anything in this group."
                (which-key-local-map-description-face :foreground ,dracula-green)
                ;; whitespace
                (whitespace-big-indent :background ,dracula-red :foreground ,dracula-red)
-               (whitespace-empty :background ,dracula-orange :foreground ,dracula-red)
+               (whitespace-empty :background "#F5F0E0" :foreground "#F5F0E0")
                (whitespace-hspace :background ,dracula-current :foreground ,dracula-comment)
                (whitespace-indentation :background ,dracula-orange :foreground ,dracula-red)
                (whitespace-line :background ,dracula-bg :foreground ,dracula-pink)

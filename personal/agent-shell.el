@@ -124,6 +124,17 @@ Useful during development to pick up changes without restarting Emacs."
 (add-hook 'agent-shell-mode-hook #'ewj/disable-line-numbers-in-agent-shell)
 (add-hook 'hack-local-variables-hook #'ewj/disable-line-numbers-in-agent-shell)
 
+;; Disable whitespace-mode in agent-shell interaction buffers
+(defun ewj/disable-whitespace-in-agent-shell ()
+  "Disable whitespace-mode in agent-shell and viewport buffers."
+  (when (derived-mode-p 'agent-shell-mode
+                        'agent-shell-viewport-view-mode
+                        'agent-shell-viewport-edit-mode)
+    (whitespace-mode -1)))
+(add-hook 'agent-shell-mode-hook #'ewj/disable-whitespace-in-agent-shell)
+(add-hook 'agent-shell-viewport-view-mode-hook #'ewj/disable-whitespace-in-agent-shell)
+(add-hook 'agent-shell-viewport-edit-mode-hook #'ewj/disable-whitespace-in-agent-shell)
+
 ;;; ELPA-only patches
 ;; These advices are only applied when using ELPA packages.
 ;; When developing upstream, implement the features directly in the code.
