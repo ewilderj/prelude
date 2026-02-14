@@ -4,7 +4,8 @@
 ;; When ~/git/agent-shell exists, use local git checkouts for development.
 ;; Otherwise, use stable ELPA versions.
 (defvar ewj/agent-shell-dev-p
-  (file-directory-p "~/git/agent-shell")
+  (or (file-directory-p "~/git/agent-shell")
+      (file-directory-p "~/git/agent-shell-quiet-mode"))
   "Non-nil when using local git checkout of agent-shell for development.")
 
 (defvar ewj/shell-maker-dev-p
@@ -31,9 +32,13 @@
 
 ;;; Load agent-shell
 (if ewj/agent-shell-dev-p
-    (progn
-      (add-to-list 'load-path (expand-file-name "~/git/agent-shell"))
+    (let ((dir (if (file-directory-p "~/git/agent-shell-quiet-mode")
+                   "~/git/agent-shell-quiet-mode"
+                 "~/git/agent-shell")))
+      (add-to-list 'load-path (expand-file-name dir))
       (require 'agent-shell)
+      (setq agent-shell-quiet-mode t)
+      (setq agent-shell-header-style 'text)
       (setq agent-shell-github-command
             '("copilot" "--yolo" "--acp" "--model" "claude-opus-4.6")))
   (use-package agent-shell
@@ -63,7 +68,10 @@ Useful during development to pick up changes without restarting Emacs."
   (when ewj/acp-el-dev-p
     (load (expand-file-name "~/git/acp.el/acp.el")))
   (when ewj/agent-shell-dev-p
-    (load (expand-file-name "~/git/agent-shell/agent-shell.el")))
+    (let ((dir (if (file-directory-p "~/git/agent-shell-quiet-mode")
+                   "~/git/agent-shell-quiet-mode"
+                 "~/git/agent-shell")))
+      (load (expand-file-name (concat dir "/agent-shell.el")))))
   (unless (or ewj/agent-shell-dev-p ewj/shell-maker-dev-p)
     (require 'agent-shell))
   ;; Re-apply customizations
@@ -103,7 +111,13 @@ Useful during development to pick up changes without restarting Emacs."
   (markdown-mermaid-enable))
 
 ;; Disable line numbers in agent-shell buffers
-(add-hook 'agent-shell-mode-hook (lambda () (display-line-numbers-mode -1)))
+;; Must override the global turn-on function so it skips these buffers.
+(defun ewj/disable-line-numbers-in-agent-shell ()
+  "Disable line numbers in agent-shell buffers."
+  (when (derived-mode-p 'agent-shell-mode)
+    (display-line-numbers-mode -1)))
+(add-hook 'agent-shell-mode-hook #'ewj/disable-line-numbers-in-agent-shell)
+(add-hook 'hack-local-variables-hook #'ewj/disable-line-numbers-in-agent-shell)
 
 ;;; ELPA-only patches
 ;; These advices are only applied when using ELPA packages.
