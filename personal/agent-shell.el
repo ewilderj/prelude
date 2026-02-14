@@ -49,7 +49,7 @@
     (agent-shell-header-style 'text)
     (agent-shell-github-command
      (if (file-exists-p "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.jsFOO")
-         '("node" "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js" "--acp" "--model" "claude-opus-4.5")
+         '("node" "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js" "--acp" "--model" "claude-opus-4.6")
        '("copilot" "--yolo" "--acp" "--model" "claude-opus-4.6")))))
 
 ;;; Reload command for development
@@ -95,14 +95,19 @@ Useful during development to pick up changes without restarting Emacs."
 
 ;; Markdown table alignment for agent-shell output
 
-(load-file "~/.emacs.d/personal/lib/markdown-overlays.el")
+(if (file-directory-p "~/git/shell-maker-pr17")
+    ;; Dev: load markdown-overlays from PR worktree (includes table support)
+    (progn
+      (load-file (expand-file-name "~/git/shell-maker-pr17/markdown-overlays-tables.el"))
+      (load-file (expand-file-name "~/git/shell-maker-pr17/markdown-overlays.el")))
+  ;; Stable: load local overlay + tables package
+  (load-file "~/.emacs.d/personal/lib/markdown-overlays.el")
+  (use-package markdown-tables
+    :after markdown-overlays
+    :load-path "personal/lib"
+    :config
+    (markdown-tables-enable)))
 (setq markdown-overlays-insert-dividers t)
-
-(use-package markdown-tables
-  :after markdown-overlays
-  :load-path "personal/lib"
-  :config
-  (markdown-tables-enable))
 
 (use-package markdown-mermaid
   :after markdown-overlays
