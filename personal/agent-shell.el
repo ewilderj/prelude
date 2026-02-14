@@ -11,12 +11,23 @@
   (file-directory-p "~/git/shell-maker")
   "Non-nil when using local git checkout of shell-maker for development.")
 
+(defvar ewj/acp-el-dev-p
+  (file-directory-p "~/git/acp.el")
+  "Non-nil when using local git checkout of acp.el for development.")
+
 ;;; Load shell-maker (dependency of agent-shell)
 (if ewj/shell-maker-dev-p
     (progn
       (add-to-list 'load-path (expand-file-name "~/git/shell-maker"))
       (require 'shell-maker))
   (use-package shell-maker :ensure t))
+
+;;; Load acp.el (dependency of agent-shell)
+(if ewj/acp-el-dev-p
+    (progn
+      (add-to-list 'load-path (expand-file-name "~/git/acp.el"))
+      (require 'acp))
+  (use-package acp :ensure t))
 
 ;;; Load agent-shell
 (if ewj/agent-shell-dev-p
@@ -42,10 +53,14 @@ Useful during development to pick up changes without restarting Emacs."
   (interactive)
   (when (featurep 'agent-shell)
     (unload-feature 'agent-shell t))
+  (when (featurep 'acp)
+    (unload-feature 'acp t))
   (when (featurep 'shell-maker)
     (unload-feature 'shell-maker t))
   (when ewj/shell-maker-dev-p
     (load (expand-file-name "~/git/shell-maker/shell-maker.el")))
+  (when ewj/acp-el-dev-p
+    (load (expand-file-name "~/git/acp.el/acp.el")))
   (when ewj/agent-shell-dev-p
     (load (expand-file-name "~/git/agent-shell/agent-shell.el")))
   (unless (or ewj/agent-shell-dev-p ewj/shell-maker-dev-p)
@@ -58,13 +73,13 @@ Useful during development to pick up changes without restarting Emacs."
 (defun ewj/agent-shell-apply-config ()
   "Apply agent-shell customizations. Called after loading/reloading."
   ;; Shorten the Copilot prompt from "Copilot> " to " ❯ "
-  (defun my/shorten-copilot-prompt (config)
-    "Replace Copilot prompt with a shorter one."
-    (when (eq (alist-get :identifier config) 'copilot)
-      (setf (alist-get :shell-prompt config) " ❯ ")
-      (setf (alist-get :shell-prompt-regexp config) " ❯ "))
-    config)
-  (advice-add 'agent-shell-github-make-copilot-config :filter-return #'my/shorten-copilot-prompt))
+  (setq agent-shell-agent-configs
+        (mapcar (lambda (config)
+                  (when (eq (alist-get :identifier config) 'copilot)
+                    (setf (alist-get :shell-prompt config) " ❯ ")
+                    (setf (alist-get :shell-prompt-regexp config) " ❯ "))
+                  config)
+                (agent-shell--make-default-agent-configs))))
 
 ;; Apply config on initial load
 (ewj/agent-shell-apply-config)
