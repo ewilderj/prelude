@@ -41,6 +41,7 @@
     :demand t
     :ensure-system-package ()
     :custom
+    (agent-shell-header-style 'text)
     (agent-shell-github-command
      (if (file-exists-p "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.jsFOO")
          '("node" "/Users/ewilderj/git/copilot-agent-runtime-test/dist-cli/index.js" "--acp" "--model" "claude-opus-4.5")
